@@ -7,9 +7,16 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
+  "proxy": "http://localhost:3000/",
   "dependencies": {
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "ip": "^1.1.5",
+    "sharp": "^0.26.3",
     "vue": "^2.6.11",
+    "vue-axios": "^3.2.2",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
