@@ -1,15 +1,27 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <br>
-    <button class="itl-button" @click="click">Оптимизировать картинки</button>
-  </div>
+    <div class="home">
+        <img alt="Vue logo" src="../assets/logo.png">
+        <br>
+        <g-button value="Оптимизировать картинки" @click="click"/>
+        <hr>
+        <form id="uploadForm"
+              enctype="multipart/form-data"
+              action="/api/file"
+              method="post"
+        >
+            <input type="file" name="userFile"/>
+            <input type="submit" value="Upload File" name="submit">
+        </form>
+    </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import GButton from "@/components/controls/g-button.vue"
 
-@Component
+@Component({
+    components: {GButton}
+})
 export default class Home extends Vue {
    click() {
        Vue.axios.get('http://localhost:3000/compress-file').then((response) => {
@@ -21,21 +33,4 @@ export default class Home extends Vue {
 }
 </script>
 <style lang="scss">
-.itl-button {
-    margin-top: 20px;
-    min-width: 100px;
-    min-height: 40px;
-    padding: 10px;
-    background: #42b983;
-    color: aliceblue;
-    font-size: 16px;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 4px;
-    transition: all 0.4s ease-in-out;
-
-    &:hover {
-        background: #00aac1;
-        cursor: pointer;
-    }
-}
 </style>
