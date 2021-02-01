@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import "./assets/styles/index.scss"
 
 const ax = axios.create({
     baseURL: "http://localhost:3000/",

@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div v-if="currentFile" class="progress">
+    <div class="upload-files">
+        <div v-if="currentFile.length" class="progress">
             <div
                 class="progress-bar progress-bar-info progress-bar-striped"
                 role="progressbar"
@@ -12,18 +12,21 @@
                 {{ progress }}%
             </div>
         </div>
-        <label class="btn btn-default">
-            <input type="file" ref="file" @change="selectFile" multiple/>
-        </label>
+        <div class="flex-row between">
+            <label class="btn btn-default">
+                <!--webkitdirectory mozdirectory-->
+                <input type="file" ref="file" @change="selectFile" multiple webkitdirectory mozdirectory/>
+            </label>
 
-        <button class="btn btn-success" :disabled="!selectedFiles" @click="upload">
-            Upload
-        </button>
+            <button class="btn btn-success" :disabled="!selectedFiles" @click="upload">
+                Загрузить
+            </button>
+        </div>
 
         <div class="alert alert-light" role="alert">{{ message }}</div>
 
-        <div class="card">
-            <div class="card-header">List of Files</div>
+        <div v-if="fileInfos.length" class="card">
+            <div class="card-header">Список файлов</div>
             <ul class="list-group list-group-flush">
                 <li
                     class="list-group-item"
@@ -90,6 +93,7 @@ export default class UploadFiles extends Vue {
             })
             .then(files => {
                 this.fileInfos = files.data;
+                this.$emit("success");
             })
             .catch(() => {
                 this.progress = 0;
@@ -107,3 +111,10 @@ export default class UploadFiles extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.upload-files {
+    width: 600px;
+    margin-top: 60px;
+}
+</style>

@@ -48,6 +48,19 @@
     "env": {
       "node": true
     },
+    "globals": {
+      "__basedir": true
+    },
+    "overrides": [
+      {
+        "files": [
+          "*.js"
+        ],
+        "rules": {
+          "@typescript-eslint/no-var-requires": "off"
+        }
+      }
+    ],
     "extends": [
       "plugin:vue/essential",
       "eslint:recommended",

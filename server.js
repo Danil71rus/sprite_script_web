@@ -14,8 +14,8 @@ if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }
 
-var corsOptions = {
-    origin: `http://${hostname}:8080`;
+const corsOptions = {
+    origin: `http://${hostname}:8080`,
 };
 
 app.use(cors(corsOptions));

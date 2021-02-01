@@ -1,10 +1,8 @@
 <template>
     <div class="home">
-        <img alt="Vue logo" src="../assets/logo.png">
-        <br>
-        <g-button value="Оптимизировать картинки" @click="click"/>
+        <upload-files @success="isUpload"></upload-files>
         <hr>
-        <upload-files></upload-files>
+        <g-button v-if="isShowButton" value="Оптимизировать картинки" @click="click"/>
     </div>
 </template>
 
@@ -17,15 +15,26 @@ import UploadFiles from "@/components/controls/UploadFiles.vue"
     components: {UploadFiles, GButton}
 })
 export default class Home extends Vue {
-   click() {
-       alert("ok")
-       // Vue.axios.get('http://localhost:3000/compress-file').then((response) => {
-       //     console.log(`response: ${response.data}`)
-       // }).catch( error=> {
-       //     console.log(`error: ${error}`)
-       // })
-   }
+    isShowButton = false
+    isUpload() {
+        this.isShowButton = true
+    }
+    click() {
+        alert("ok")
+        // Vue.axios.get('http://localhost:3000/compress-file').then((response) => {
+        //     console.log(`response: ${response.data}`)
+        // }).catch( error=> {
+        //     console.log(`error: ${error}`)
+        // })
+    }
 }
 </script>
 <style lang="scss">
+.home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    margin: auto;
+}
 </style>
