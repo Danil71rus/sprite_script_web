@@ -2,70 +2,89 @@ const uploadFile = require("../middleware/upload");
 const fs = require("fs");
 const baseUrl = "http://localhost:3000/files/";
 
+
+const createDir = function () {
+    const dirPath = __basedir + "/uploads";
+    const dirName = String(Date.now());
+    const fullPath = `${dirPath}/${dirName}`;
+
+    if (!fs.existsSync(fullPath)) {
+        fs.mkdirSync(fullPath);
+    }
+    return dirName;
+}
+
 const upload = async (req, res) => {
-  try {
-    await uploadFile(req, res);
+    try {
+        req.dirName = createDir();
+        await uploadFile(req, res);
 
-    if (req.files == undefined) {
-      return res.status(400).send({ message: "Please upload a file!" });
+        if (req.files == undefined) {
+            return res.status(400).send({message: "Please upload a file!"});
+        }
+
+        res.status(200).send({
+            dirName: req.dirName, //+ req.files.originalname,
+        });
+    } catch (err) {
+        console.log(err);
+
+        if (err.code == "LIMIT_FILE_SIZE") {
+            return res.status(500).send({
+                message: "File size cannot be larger than 100MB!",
+            });
+        }
+
+        res.status(500).send({
+            message: `Could not upload the file: `, //${req.file.originalname}. ${err}`,
+        });
     }
-
-    res.status(200).send({
-      message: "Uploaded the file successfully: ", //+ req.files.originalname,
-    });
-  } catch (err) {
-    console.log(err);
-
-    if (err.code == "LIMIT_FILE_SIZE") {
-      return res.status(500).send({
-        message: "File size cannot be larger than 100MB!",
-      });
-    }
-
-    res.status(500).send({
-      message: `Could not upload the file: `, //${req.file.originalname}. ${err}`,
-    });
-  }
 };
 
 const getListFiles = (req, res) => {
-  const directoryPath = __basedir + "/uploads/";
-
-  fs.readdir(directoryPath, function (err, files) {
-    if (err) {
-      res.status(500).send({
-        message: "Unable to scan files!",
-      });
+    if (!req.query.dirName) {
+        res.status(200);
+        return;
     }
 
-    let fileInfos = [];
+    let directoryPath = __basedir + "/uploads/";
+        directoryPath += req.query.dirName + "/";
 
-    files.forEach((file) => {
-      fileInfos.push({
-        name: file,
-        url: baseUrl + file,
-      });
+    fs.readdir(directoryPath, function (err, files) {
+        if (err) {
+            res.status(500).send({
+                message: "Unable to scan files!",
+            });
+        }
+        const fileInfos = [];
+
+        files.forEach( file => {
+            const fileStats = fs.statSync(directoryPath + file);
+            fileInfos.push({
+                name: file,
+                size: (fileStats.size / (1024 * 1024)).toFixed(3),
+            });
+        });
+
+        res.status(200).send(fileInfos);
     });
-
-    res.status(200).send(fileInfos);
-  });
 };
 
 const download = (req, res) => {
-  const fileName = req.params.name;
-  const directoryPath = __basedir + "/uploads/";
+    const fileName = req.params.name;
+    const directoryPath = __basedir + "/uploads/";
 
-  res.download(directoryPath + fileName, fileName, (err) => {
-    if (err) {
-      res.status(500).send({
-        message: "Could not download the file. " + err,
-      });
-    }
-  });
+    res.download(directoryPath + fileName, fileName, (err) => {
+        if (err) {
+            res.status(500).send({
+                message: "Could not download the file. " + err,
+            });
+        }
+    });
 };
 
 module.exports = {
-  upload,
-  getListFiles,
-  download,
+    upload,
+    getListFiles,
+    download,
 };

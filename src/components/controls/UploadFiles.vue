@@ -23,17 +23,18 @@
             </button>
         </div>
 
-        <div class="alert alert-light" role="alert">{{ message }}</div>
-
         <div v-if="fileInfos.length" class="card">
             <div class="card-header">Список файлов</div>
             <ul class="list-group list-group-flush">
                 <li
-                    class="list-group-item"
+                    class="list-group-item flex-row between"
                     v-for="(file, index) in fileInfos"
                     :key="index"
                 >
-                    <a :href="file.url">{{ file.name }}</a>
+                    <div class="name">{{ file.name }}</div>
+                    <div class="flex-row between" style="width: 180px">
+                        <size> {{ file.size }}</size>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -60,8 +61,8 @@ class UploadFilesService {
         });
     }
 
-    static getFiles() {
-        return Vue.axios.get("/files");
+    static getFiles(params) {
+        return Vue.axios.get("/files", {params: params});
     }
 }
 
@@ -72,7 +73,6 @@ export default class UploadFiles extends Vue {
     selectedFiles = []
     currentFile = []
     progress = 0
-    message = ""
     fileInfos = []
 
     selectFile() {
@@ -88,8 +88,10 @@ export default class UploadFiles extends Vue {
             this.progress = Math.round((100 * event.loaded) / event.total);
         })
             .then(response => {
-                this.message = response.data.message;
-                return UploadFilesService.getFiles();
+                this.$router.push({ path: `/${response.data.dirName}` })
+                return UploadFilesService.getFiles({
+                  dirName: response.data.dirName,
+                });
             })
             .then(files => {
                 this.fileInfos = files.data;
@@ -105,7 +107,8 @@ export default class UploadFiles extends Vue {
     }
 
     mounted() {
-        UploadFilesService.getFiles().then(response => {
+        const obg = this.$route.params.dir ? {dirName: this.$route.params.dir} : undefined
+        UploadFilesService.getFiles(obg).then(response => {
             this.fileInfos = response.data;
         });
     }
@@ -116,5 +119,14 @@ export default class UploadFiles extends Vue {
 .upload-files {
     width: 600px;
     margin-top: 60px;
+    .name {
+        width: 300px;
+    }
+    size {
+        &::after {
+            content: "Мб";
+            font-weight: bold;
+        }
+    }
 }
 </style>
