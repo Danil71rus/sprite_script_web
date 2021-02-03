@@ -2,8 +2,9 @@ const uploadFile = require("../middleware/upload");
 const compressFile = require("../compress/compress-file.js");
 const AdmZip = require('adm-zip');
 const fs = require("fs");
-const baseUrl = "http://localhost:3000/files/";
+const util = require("util");
 
+const readDir = util.promisify(fs.readdir)
 
 const createDir = function () {
     const dirPath = __basedir + "/uploads";
@@ -52,24 +53,21 @@ const getListFiles = (req, res) => {
     let directoryPath = __basedir + "/uploads/";
         directoryPath += req.query.dirName + "/";
 
-    fs.readdir(directoryPath, function (err, files) {
-        if (err) {
-            res.status(500).send({
-                message: "Unable to scan files!",
-            });
-        }
-        const fileInfos = [];
-
-        files.forEach( file => {
+    readDir(directoryPath).then(files=>{
+        const fileInfos = files.map(file => {
             const fileStats = fs.statSync(directoryPath + file);
-            fileInfos.push({
+            return {
                 name: file,
                 size: (fileStats.size / (1024 * 1024)).toFixed(3),
-            });
+            }
         });
-
         res.status(200).send(fileInfos);
-    });
+    }).catch(err=>{
+        console.log(err);
+        res.status(500).send({
+            message: "Unable to scan files!",
+        });
+    })
 };
 
 const download = (req, res) => {
@@ -104,21 +102,15 @@ const download = (req, res) => {
     // });
 };
 
-const onCompressFiles = (req, res) => {
+const onCompressFiles = async (req, res) => {
     try {
         if (!req.query.dirName) {
             res.status(500).send(null);
             return;
         }
-        compressFile(req.query.dirName).then((dirPath) => {
-            req.dirName = dirPath;
-            getListFiles(req, res);
-        }).catch(err=>{
-            console.log(err);
-            return res.status(500).send({
-                message: err,
-            });
-        })
+        const dirPath = await compressFile(req.query.dirName);
+        req.dirName = dirPath;
+        getListFiles(req, res);
     } catch (err) {
         console.log(err);
 
