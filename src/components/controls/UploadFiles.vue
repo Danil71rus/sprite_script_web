@@ -44,7 +44,7 @@
             </ul>
         </div>
         <div class="download flex-row middle mt-x2">
-            <g-button v-if="this.$route.params.dir" value="Оптимизировать картинки" @click="click"/>
+            <g-button v-if="fileInfos.length" value="Оптимизировать картинки" @click="click"/>
             <g-link v-if="urlDownload" :href="urlDownload" value="Скачать архив"/>
         </div>
 
@@ -52,9 +52,9 @@
 </template>
 
 <script>
-import {Component, Vue} from "vue-property-decorator"
+import {Component, Vue, Watch} from "vue-property-decorator"
 import GButton from "@c/controls/g-button"
-import GLink from "@c/controls/g-link";
+import GLink from "@c/controls/g-link"
 
 class UploadFilesService {
     static upload(files, onUploadProgress) {
@@ -83,8 +83,8 @@ class UploadFilesService {
 })
 
 export default class UploadFiles extends Vue {
-
-    mounted() {
+    @Watch("$route.params.dir")
+    onChengUrl() {
         const obg = this.$route.params.dir ? {dirName: this.$route.params.dir} : undefined
         UploadFilesService.getFiles(obg).then(response => {
             this.fileInfos = response.data;
@@ -132,10 +132,21 @@ export default class UploadFiles extends Vue {
         this.selectedFiles = [];
     }
 
-    click() {
+    delayPromis(ms, res) {
+        return new Promise((resolve, reject) => {
+            setTimeout(function () {
+                resolve(res)
+            }, ms);
+        });
+    }
+
+     click() {
         if (this.$route.params.dir) {
             const obg = {dirName: this.$route.params.dir}
             Vue.axios.get('/compress-file', {params: obg})
+                .then(res=>{
+                    return this.delayPromis(5000, res);
+                })
                 .then((response) => {
                     return UploadFilesService.getFiles({
                         dirName: response.data,
