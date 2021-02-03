@@ -7,13 +7,13 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
     {
-        path: '/home',
-        name: 'Home',
+        path: '/compress',
+        name: 'Compress',
         component: Home,
         children: [
             {
-                path: '/home/:dir',
-                name: 'Home',
+                path: '/compress/:dir',
+                name: 'Compress',
                 component: Home
             },
         ]

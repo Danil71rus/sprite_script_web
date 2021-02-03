@@ -1,14 +1,26 @@
 <template>
-    <button class="itl-button" @click="$emit('click')">{{ value }}</button>
+    <button class="itl-button" @click="$emit('click')">
+        <template v-if="!isLoading">
+            {{ value }}
+        </template>
+        <g-spinner
+            v-if="isLoading"
+            size="small"
+        />
+    </button>
 </template>
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
-
-@Component
+import GSpinner from "@/components/controls/g-spinner.vue"
+@Component({
+    components: {GSpinner}
+})
 export default class GButton extends Vue {
     @Prop({ type: String, default: "button" })
     readonly value!: string
+    @Prop({ type: Boolean, default: false })
+    readonly isLoading!: boolean
 }
 </script>
 <style scoped lang="scss">

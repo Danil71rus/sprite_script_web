@@ -44,7 +44,7 @@
             </ul>
         </div>
         <div class="download flex-row middle mt-x2">
-            <g-button v-if="fileInfos.length" value="Оптимизировать картинки" @click="click"/>
+            <g-button v-if="fileInfos.length" :is-loading="isLoading" value="Оптимизировать картинки" @click="click"/>
             <g-link v-if="urlDownload" :href="urlDownload" value="Скачать архив"/>
         </div>
 
@@ -96,6 +96,7 @@ export default class UploadFiles extends Vue {
     progress = 0
     fileInfos = []
     toFileInfos = []
+    isLoading = false
 
     get urlDownload() {
         return this.toFileInfos.length && this.$route.params.dir ?
@@ -115,7 +116,7 @@ export default class UploadFiles extends Vue {
             this.progress = Math.round((100 * event.loaded) / event.total);
         })
             .then(response => {
-                this.$router.push({ path: `/home/${response.data.dirName}` });
+                this.$router.push({ name: 'Compress', params: { dir: response.data.dirName } });
                 return UploadFilesService.getFiles({
                   dirName: response.data.dirName,
                 });
@@ -145,6 +146,7 @@ export default class UploadFiles extends Vue {
             const obg = {dirName: this.$route.params.dir}
             Vue.axios.get('/compress-file', {params: obg})
                 .then(res=>{
+                    this.isLoading = true
                     return this.delayPromis(5000, res);
                 })
                 .then((response) => {
@@ -153,6 +155,7 @@ export default class UploadFiles extends Vue {
                     });
                 })
                 .then(res => {
+                    this.isLoading = false
                     this.toFileInfos = res.data;
                 })
                 .catch(() => {
