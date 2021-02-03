@@ -67,7 +67,7 @@ const getListFiles = (req, res) => {
         res.status(500).send({
             message: "Unable to scan files!",
         });
-    })
+    });
 };
 
 const download = (req, res) => {
@@ -109,8 +109,8 @@ const onCompressFiles = async (req, res) => {
             return;
         }
         const dirPath = await compressFile(req.query.dirName);
-        req.dirName = dirPath;
-        getListFiles(req, res);
+        res.status(200).send(dirPath);
+        // getListFiles(req, res);
     } catch (err) {
         console.log(err);
 

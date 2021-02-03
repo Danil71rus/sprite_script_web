@@ -13,6 +13,7 @@ const compressFile = function(dirPath) {
         if (!dirPath) {
             reject({error: `not found dir: ${dirPath}`});
         }
+        const initDirPath = dirPath;
         dirPath = `./uploads/${dirPath}`
         readDir(dirPath).then(fileList => {
             fileList.forEach( file => {
@@ -24,10 +25,10 @@ const compressFile = function(dirPath) {
                     return unlink(filePath);
                 }).then( () => {
                     // оптимезированный переименовываем в старое название
-                    return  rename(newFilePath, filePath);
+                    return rename(newFilePath, filePath);
                 }).then( () => {
                     console.log(`Вce: ${filePath}`)
-                    resolve(dirPath);
+                    resolve(initDirPath);
                 }).catch(err=>{
                     console.log(err);
                     reject(err);

@@ -137,7 +137,12 @@ export default class UploadFiles extends Vue {
             const obg = {dirName: this.$route.params.dir}
             Vue.axios.get('/compress-file', {params: obg})
                 .then((response) => {
-                    this.toFileInfos = response.data;
+                    return UploadFilesService.getFiles({
+                        dirName: response.data,
+                    });
+                })
+                .then(res => {
+                    this.toFileInfos = res.data;
                 })
                 .catch(() => {
                     this.progress = 0;
