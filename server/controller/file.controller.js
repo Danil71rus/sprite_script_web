@@ -1,4 +1,5 @@
 const uploadFile = require("../middleware/upload");
+const compressFile = require("../compress/compress-file.js");
 const fs = require("fs");
 const baseUrl = "http://localhost:3000/files/";
 
@@ -43,7 +44,7 @@ const upload = async (req, res) => {
 
 const getListFiles = (req, res) => {
     if (!req.query.dirName) {
-        res.status(200);
+        res.status(200).send(null);
         return;
     }
 
@@ -83,8 +84,39 @@ const download = (req, res) => {
     });
 };
 
+const onCompressFiles = (req, res) => {
+    try {
+        if (!req.query.dirName) {
+            res.status(500).send(null);
+            return;
+        }
+        compressFile(req.query.dirName).then((dirPath) => {
+            req.dirName = dirPath;
+            getListFiles(req, res);
+        }).catch(err=>{
+            console.log(err);
+            return res.status(500).send({
+                message: err,
+            });
+        })
+    } catch (err) {
+        console.log(err);
+
+        if (err.code == "LIMIT_FILE_SIZE") {
+            return res.status(500).send({
+                message: "File size cannot be larger than 100MB!",
+            });
+        }
+
+        res.status(500).send({
+            message: `Could not upload the file: `, //${req.file.originalname}. ${err}`,
+        });
+    }
+};
+
 module.exports = {
     upload,
     getListFiles,
     download,
+    onCompressFiles,
 };

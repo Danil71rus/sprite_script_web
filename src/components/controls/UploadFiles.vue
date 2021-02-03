@@ -32,17 +32,25 @@
                     :key="index"
                 >
                     <div class="name">{{ file.name }}</div>
-                    <div class="flex-row between" style="width: 180px">
-                        <size> {{ file.size }}</size>
+                    <div v-if="toFileInfos.length" class="compare flex-row between ">
+                        <div class="flex-column">
+                            <div class="size"> {{ file.size }}</div>
+                            <div class="size"> {{ toFileInfos[index].size }}</div>
+                        </div>
+                        <div class="persent"> {{ getPersent(file.size, toFileInfos[index].size) }}</div>
                     </div>
+                    <div v-else class="size"> {{ file.size }}</div>
                 </li>
             </ul>
         </div>
+
+        <g-button v-if="this.$route.params.dir" value="Оптимизировать картинки" @click="click"/>
     </div>
 </template>
 
 <script>
 import {Component, Vue} from "vue-property-decorator"
+import GButton from "@c/controls/g-button"
 
 class UploadFilesService {
     static upload(files, onUploadProgress) {
@@ -66,14 +74,24 @@ class UploadFilesService {
     }
 }
 
-@Component
+@Component({
+    components: {GButton}
+})
 
 export default class UploadFiles extends Vue {
+
+    mounted() {
+        const obg = this.$route.params.dir ? {dirName: this.$route.params.dir} : undefined
+        UploadFilesService.getFiles(obg).then(response => {
+            this.fileInfos = response.data;
+        });
+    }
 
     selectedFiles = []
     currentFile = []
     progress = 0
     fileInfos = []
+    toFileInfos = []
 
     selectFile() {
         this.selectedFiles = this.$refs.file.files;
@@ -88,29 +106,42 @@ export default class UploadFiles extends Vue {
             this.progress = Math.round((100 * event.loaded) / event.total);
         })
             .then(response => {
-                this.$router.push({ path: `/${response.data.dirName}` })
+                this.$router.push({ path: `/home/${response.data.dirName}` });
                 return UploadFilesService.getFiles({
                   dirName: response.data.dirName,
                 });
             })
             .then(files => {
                 this.fileInfos = files.data;
-                this.$emit("success");
             })
             .catch(() => {
                 this.progress = 0;
                 this.message = "Could not upload the file!";
-                this.currentFile = undefined;
+                this.currentFile = [];
             });
 
-        this.selectedFiles = undefined;
+        this.selectedFiles = [];
     }
 
-    mounted() {
-        const obg = this.$route.params.dir ? {dirName: this.$route.params.dir} : undefined
-        UploadFilesService.getFiles(obg).then(response => {
-            this.fileInfos = response.data;
-        });
+    click() {
+        if (this.$route.params.dir) {
+            const obg = {dirName: this.$route.params.dir}
+            Vue.axios.get('/compress-file', {params: obg})
+                .then((response) => {
+                    this.toFileInfos = response.data;
+                })
+                .catch(() => {
+                    this.progress = 0;
+                    this.message = "Could not upload the file!";
+                    this.currentFile = [];
+                })
+        }
+    }
+
+    getPersent(a, b) {
+        a = Number(a);
+        b = Number(b);
+        return (((a-b)/a)*100).toFixed(0);
     }
 }
 </script>
@@ -119,13 +150,28 @@ export default class UploadFiles extends Vue {
 .upload-files {
     width: 600px;
     margin-top: 60px;
-    .name {
-        width: 300px;
-    }
-    size {
-        &::after {
-            content: "Мб";
-            font-weight: bold;
+    margin-bottom: 60px;
+    .list-group-item {
+        align-items: center;
+        .compare {
+            align-items: center;
+        }
+        .name {
+            width: 300px;
+        }
+        .size {
+            margin-right: 16px;
+            &::after {
+                content: " Мб";
+                font-weight: bold;
+            }
+        }
+        .persent {
+            color: #00B956;
+            &::after {
+                content: "%";
+                font-weight: bold;
+            }
         }
     }
 }

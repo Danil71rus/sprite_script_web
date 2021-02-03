@@ -2,28 +2,43 @@
 // var newName = dir.split("-")[1]; берет название между первым и вторым знаком "-"
 const sharp = require('sharp');
 const fs = require('fs');
+const util = require("util");
 
-const compressFile = function () {
-    let errs = {}
-    let dirPath = "./files";
-    let fileList = fs.readdirSync(dirPath);
-    fileList.forEach(function (file) {
-        let filePath = dirPath + "/" + file,
-            newFilePath = dirPath + "/" + "new_" + file;
-        console.log(`filePath: ${filePath}`)
-        // Оптимизация compressionLevel = 8
-        sharp(filePath).png({compressionLevel: 8}).toFile(newFilePath, function(err, info) {
-            if (err) {
-                console.log(`err:  ${JSON.stringify(err, null, 4)}`);
-                errs.error = `err:  ${JSON.stringify(err, null, 4)}`;
-            }
-            // удаляем не оптимизированный картинку
-            fs.unlinkSync(filePath);
-            // оптимезированный переименовываем в старое название
-            fs.renameSync(newFilePath, filePath);
+const readDir = util.promisify(fs.readdir)
+const unlink = util.promisify(fs.unlink)
+const rename = util.promisify(fs.rename)
+
+const compressFile = function(dirPath) {
+    return new Promise( (resolve, reject) => {
+        if (!dirPath) {
+            reject({error: `not found dir: ${dirPath}`});
+        }
+        const errs = {}
+        dirPath = `./uploads/${dirPath}`
+        readDir(dirPath).then(fileList => {
+            fileList.forEach( file => {
+                const filePath = dirPath + "/" + file,
+                    newFilePath = dirPath + "/" + "new_" + file;
+                //Оптимизация compressionLevel = 8
+                sharp(filePath).png({compressionLevel: 8}).toFile(newFilePath).then( () => {
+                    // удаляем не оптимизированный картинку
+                    return unlink(filePath);
+                }).then( () => {
+                    // оптимезированный переименовываем в старое название
+                    return  rename(newFilePath, filePath);
+                }).then( () => {
+                    console.log(`Вce: ${filePath}`)
+                    resolve(dirPath);
+                }).catch(err=>{
+                    console.log(err);
+                    reject(err);
+                })
+            });
+        }).catch(err => {
+            reject(err);
         });
     });
-    return errs;
 }
 
-module.exports = compressFile
+// const compress = util.promisify(compressFile);
+module.exports = compressFile;
