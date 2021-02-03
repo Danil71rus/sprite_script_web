@@ -1,5 +1,6 @@
 const uploadFile = require("../middleware/upload");
 const compressFile = require("../compress/compress-file.js");
+const AdmZip = require('adm-zip');
 const fs = require("fs");
 const baseUrl = "http://localhost:3000/files/";
 
@@ -72,16 +73,35 @@ const getListFiles = (req, res) => {
 };
 
 const download = (req, res) => {
-    const fileName = req.params.name;
-    const directoryPath = __basedir + "/uploads/";
+    if (!req.query.dirName) {
+        res.status(200).send(null);
+        return;
+    }
 
-    res.download(directoryPath + fileName, fileName, (err) => {
-        if (err) {
-            res.status(500).send({
-                message: "Could not download the file. " + err,
-            });
-        }
+    const zip = new AdmZip();
+    const directoryPath = __basedir + "/uploads/";
+    const dirName = req.query.dirName;
+    const fullPath = directoryPath + dirName;
+
+    const fileList = fs.readdirSync(fullPath);
+
+    fileList.forEach(file=>{
+        zip.addLocalFile(`${fullPath}/${file}`);
     });
+
+    const data = zip.toBuffer();
+    res.set('Content-Type','application/octet-stream');
+    res.set('Content-Disposition',`attachment; filename=${Date.now()}.zip`);
+    res.set('Content-Length',data.length);
+    res.send(data);
+
+    // res.download(directoryPath + dirName, dirName, (err) => {
+    //     if (err) {
+    //         res.status(500).send({
+    //             message: "Could not download the file. " + err,
+    //         });
+    //     }
+    // });
 };
 
 const onCompressFiles = (req, res) => {

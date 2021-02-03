@@ -13,7 +13,6 @@ const compressFile = function(dirPath) {
         if (!dirPath) {
             reject({error: `not found dir: ${dirPath}`});
         }
-        const errs = {}
         dirPath = `./uploads/${dirPath}`
         readDir(dirPath).then(fileList => {
             fileList.forEach( file => {

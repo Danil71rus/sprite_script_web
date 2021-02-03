@@ -13,7 +13,6 @@ export default class GButton extends Vue {
 </script>
 <style scoped lang="scss">
 .itl-button {
-    margin-top: 20px;
     min-width: 100px;
     min-height: 40px;
     padding: 10px;

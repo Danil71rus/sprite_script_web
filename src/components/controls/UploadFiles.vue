@@ -43,14 +43,18 @@
                 </li>
             </ul>
         </div>
+        <div class="download flex-row middle mt-x2">
+            <g-button v-if="this.$route.params.dir" value="Оптимизировать картинки" @click="click"/>
+            <g-link v-if="urlDownload" :href="urlDownload" value="Скачать архив"/>
+        </div>
 
-        <g-button v-if="this.$route.params.dir" value="Оптимизировать картинки" @click="click"/>
     </div>
 </template>
 
 <script>
 import {Component, Vue} from "vue-property-decorator"
 import GButton from "@c/controls/g-button"
+import GLink from "@c/controls/g-link";
 
 class UploadFilesService {
     static upload(files, onUploadProgress) {
@@ -75,7 +79,7 @@ class UploadFilesService {
 }
 
 @Component({
-    components: {GButton}
+    components: {GLink, GButton}
 })
 
 export default class UploadFiles extends Vue {
@@ -92,6 +96,11 @@ export default class UploadFiles extends Vue {
     progress = 0
     fileInfos = []
     toFileInfos = []
+
+    get urlDownload() {
+        return this.toFileInfos.length && this.$route.params.dir ?
+            `http://localhost:3000/zip?dirName=${this.$route.params.dir}`: false
+    }
 
     selectFile() {
         this.selectedFiles = this.$refs.file.files;
@@ -172,6 +181,15 @@ export default class UploadFiles extends Vue {
                 content: "%";
                 font-weight: bold;
             }
+        }
+    }
+    .download {
+        justify-content: center;
+        &>*:not(:last-child) {
+           margin-right: 20px;
+        }
+        a {
+
         }
     }
 }
