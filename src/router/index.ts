@@ -6,6 +6,7 @@ import About from '../views/About.vue'
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
+    { path: '/', redirect: '/compress' },
     {
         path: '/compress',
         name: 'Compress',
