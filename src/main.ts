@@ -5,8 +5,7 @@ import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import './assets/styles/index.scss'
-// @ts-ignore
-import config from '../my.config.js'
+const config = require("../my.config")
 
 
 Vue.prototype.$dataServer = config.serverFile;
