@@ -102,7 +102,7 @@ export default class UploadFiles extends Vue {
 
     get urlDownload() {
         return this.toFileInfos.length && this.$route.params.dir ?
-            `http://localhost:3000/zip?dirName=${this.$route.params.dir}`: false
+            `http://${location.hostname}:${this.$dataServer.port}/zip?dirName=${this.$route.params.dir}`: false
     }
 
     selectFile() {

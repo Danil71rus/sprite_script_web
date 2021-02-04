@@ -1,8 +1,9 @@
 const path = require("path")
+const myConfig = require("./my.config")
 
 module.exports = {
   devServer: {
-    port: 8080
+    port: myConfig.client.port,
   },
   configureWebpack: {
     devtool: "source-map",

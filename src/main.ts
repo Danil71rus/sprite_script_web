@@ -4,10 +4,15 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import "./assets/styles/index.scss"
+import './assets/styles/index.scss'
+// @ts-ignore
+import config from '../my.config.js'
+
+
+Vue.prototype.$dataServer = config.serverFile;
 
 const ax = axios.create({
-    baseURL: "http://localhost:3000/",
+    baseURL: `http://${location.hostname}:${config.serverFile.port}/`,
     headers: {
       "Content-type": "application/json"
     }

@@ -3,10 +3,12 @@ const fs = require('fs');
 const cors = require("cors");
 const express = require("express");
 
+const config = require("./my.config");
+
 const app = express();
 // const hostname = ip.address();
-const hostname = "localhost";
-const port = 3000;
+const hostname = config.serverFile.host;
+const port = config.serverFile.port;
 
 global.__basedir = __dirname;
 const dir = __basedir + "/uploads";
@@ -15,7 +17,7 @@ if (!fs.existsSync(dir)){
 }
 
 const corsOptions = {
-    origin: `http://${hostname}:8080`,
+    origin: `http://${hostname}:${config.client.port}`,
 };
 
 app.use(cors(corsOptions));

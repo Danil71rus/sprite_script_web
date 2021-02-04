@@ -10,7 +10,6 @@
     "start_w": "start npm run serve && start node server.js",
     "start": "concurrently --kill-others \"npm run serve\" \"node server.js\""
   },
-  "proxy": "http://localhost:3000/",
   "dependencies": {
     "adm-zip": "^0.5.2",
     "axios": "^0.21.1",
