@@ -17,10 +17,30 @@ const createDir = function () {
     return dirName;
 }
 
+const removeDirTimeout = function (dirName, time) {
+    const dirPath = __basedir + "/uploads";
+    const fullPath = `${dirPath}/${dirName}`;
+    setTimeout(function() {
+        readDir(fullPath).then(fileList=>{
+            fileList.forEach(file=>{
+                const filePath = fullPath + "/" + file;
+                fs.unlinkSync(filePath);
+            })
+            return;
+        }).then(() => {
+            console.log(`Удаляем папку "${dirName}" !!!`);
+            if (fs.existsSync(fullPath)) {
+                fs.rmdirSync(fullPath);
+            }
+        }).catch(err=>console.log(err));
+    }, time);
+}
+
 const upload = async (req, res) => {
     try {
         req.dirName = createDir();
         await uploadFile(req, res);
+        removeDirTimeout(req.dirName, 1000*60*5); // удаляем через 5 минут
 
         if (req.files == undefined) {
             return res.status(400).send({message: "Please upload a file!"});

@@ -83,11 +83,13 @@ class UploadFilesService {
 })
 
 export default class UploadFiles extends Vue {
-    @Watch("$route.params.dir")
+    @Watch("$route.params.dir", {immediate: true})
     onChengUrl() {
         const obg = this.$route.params.dir ? {dirName: this.$route.params.dir} : undefined
         UploadFilesService.getFiles(obg).then(response => {
             this.fileInfos = response.data;
+        }).catch(err=>{
+            this.$router.push({ path: `/compress` });
         });
     }
 
