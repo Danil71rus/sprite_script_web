@@ -2,10 +2,10 @@
 module.exports = {
   serverFile: {
     port: 3000,
-    host: "localhost",
-    // host: "192.168.1.68",
+    host: "auto", // "localhost" | "auto"  (задать свой или auto)
+    dirProject: "dist",
   },
   client: {
-    port: 8080,
+    port: 8080, // необязательно, только во время разработки
   }
 };

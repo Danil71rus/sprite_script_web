@@ -2,35 +2,32 @@ const ip = require("ip");
 const fs = require('fs');
 const cors = require("cors");
 const express = require("express");
+const history = require('connect-history-api-fallback');
 const path = require('path');
-
 const config = require("./my.config");
+const util = require("./server/util");
+
+const hostname = config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
+const port = config.serverFile.port;
+const dirProject = config.serverFile.dirProject;
+global.__basedir = __dirname;
 
 const app = express();
-// const hostname = ip.address();
-const hostname = config.serverFile.host;
-const port = config.serverFile.port;
+const staticFileMiddleware = express.static(path.join(__dirname, dirProject));
 
-const htmlPath = path.join(__dirname, 'dist');
-app.use(express.static(htmlPath));
-
-
-global.__basedir = __dirname;
-const dir = __basedir + "/uploads";
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-}
-
+util.createUploidDir();
 
 const corsOptions = {
     origin: `http://${hostname}:${config.client.port}`,
 };
-app.use(cors(corsOptions));
-
 const initRoutes = require("./server/routes");
-
-app.use(express.urlencoded({ extended: true }));
 initRoutes(app);
+
+app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
+app.use(staticFileMiddleware);
+app.use(history());
+app.use(staticFileMiddleware);
 
 app.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);

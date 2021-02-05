@@ -3,44 +3,15 @@ const compressFile = require("../compress/compress-file.js");
 const AdmZip = require('adm-zip');
 const fs = require("fs");
 const util = require("util");
+const myUtil = require("../util");
 
-const readDir = util.promisify(fs.readdir)
-
-const createDir = function () {
-    const dirPath = __basedir + "/uploads";
-    const dirName = String(Date.now());
-    const fullPath = `${dirPath}/${dirName}`;
-
-    if (!fs.existsSync(fullPath)) {
-        fs.mkdirSync(fullPath);
-    }
-    return dirName;
-}
-
-const removeDirTimeout = function (dirName, time) {
-    const dirPath = __basedir + "/uploads";
-    const fullPath = `${dirPath}/${dirName}`;
-    setTimeout(function() {
-        readDir(fullPath).then(fileList=>{
-            fileList.forEach(file=>{
-                const filePath = fullPath + "/" + file;
-                fs.unlinkSync(filePath);
-            })
-            return;
-        }).then(() => {
-            console.log(`Удаляем папку "${dirName}" !!!`);
-            if (fs.existsSync(fullPath)) {
-                fs.rmdirSync(fullPath);
-            }
-        }).catch(err=>console.log(err));
-    }, time);
-}
+const readDir = util.promisify(fs.readdir);
 
 const upload = async (req, res) => {
     try {
-        req.dirName = createDir();
+        req.dirName = myUtil.createDir();
         await uploadFile(req, res);
-        removeDirTimeout(req.dirName, 1000*60*5); // удаляем через 5 минут
+        myUtil.removeDirTimeout(req.dirName, 1000*60*5); // удаляем через 5 минут
 
         if (req.files == undefined) {
             return res.status(400).send({message: "Please upload a file!"});
@@ -91,6 +62,8 @@ const getListFiles = (req, res) => {
 };
 
 const download = (req, res) => {
+    console.log("download");
+    console.log(req.query.dirName);
     if (!req.query.dirName) {
         res.status(200).send(null);
         return;
@@ -102,6 +75,8 @@ const download = (req, res) => {
     const fullPath = directoryPath + dirName;
 
     const fileList = fs.readdirSync(fullPath);
+
+    console.log(req.query.dirName);
 
     fileList.forEach(file=>{
         zip.addLocalFile(`${fullPath}/${file}`);
