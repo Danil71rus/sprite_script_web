@@ -62,7 +62,6 @@ const getListFiles = (req, res) => {
 };
 
 const download = (req, res) => {
-    console.log(`download dir: ${req.query.dirName}`);
     if (!req.query.dirName) {
         res.status(200).send(null);
         return;
@@ -84,6 +83,8 @@ const download = (req, res) => {
     res.set('Content-Disposition',`attachment; filename=${Date.now()}.zip`);
     res.set('Content-Length',data.length);
     res.send(data);
+
+    console.log(`download dir: ${req.query.dirName}`);
 
     // res.download(directoryPath + dirName, dirName, (err) => {
     //     if (err) {
