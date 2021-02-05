@@ -62,8 +62,7 @@ const getListFiles = (req, res) => {
 };
 
 const download = (req, res) => {
-    console.log("download");
-    console.log(req.query.dirName);
+    console.log(`download dir: ${req.query.dirName}`);
     if (!req.query.dirName) {
         res.status(200).send(null);
         return;
@@ -75,8 +74,6 @@ const download = (req, res) => {
     const fullPath = directoryPath + dirName;
 
     const fileList = fs.readdirSync(fullPath);
-
-    console.log(req.query.dirName);
 
     fileList.forEach(file=>{
         zip.addLocalFile(`${fullPath}/${file}`);
