@@ -214,4 +214,9 @@ export default class UploadFiles extends Vue {
         }
     }
 }
+@media (max-width: 600px) {
+    .upload-files {
+        width: 100%;
+    }
+}
 </style>
