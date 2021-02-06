@@ -1,4 +1,4 @@
-const ip = require("ip");
+//const ip = require("ip");
 const cors = require("cors");
 const express = require("express");
 const history = require('connect-history-api-fallback');
@@ -6,7 +6,7 @@ const path = require('path');
 const config = require("./my.config");
 const util = require("./server/util");
 
-const hostname = config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
+const hostname = "123";//config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
 const port = config.serverFile.port;
 const dirProject = config.serverFile.dirProject;
 global.__basedir = __dirname;
