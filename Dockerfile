@@ -1,13 +1,11 @@
-FROM node:12.18.3
+FROM node
 
-#RUN mkdir -p /usr/src/app/
-
-WORKDIR /usr/app/front
-EXPOSE 3000
-COPY ./ ./
-
-RUN npm config set registry http://registry.npmjs.org/
+RUN mkdir -p /usr/src/app/
+WORKDIR /usr/src/app/
+COPY ./ ./usr/src/app/
 RUN npm install
+
+EXPOSE 3000
 
 CMD ["node", "server.js"]
 
