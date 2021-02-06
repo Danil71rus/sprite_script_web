@@ -1,5 +1,4 @@
 const ip = require("ip");
-const fs = require('fs');
 const cors = require("cors");
 const express = require("express");
 const history = require('connect-history-api-fallback');
@@ -25,10 +24,11 @@ initRoutes(app);
 
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
-app.use(staticFileMiddleware);
 app.use(history());
 app.use(staticFileMiddleware);
 
-app.listen(port, hostname, () => {
+//app.listen(port, hostname, () => {
+app.listen(port, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
+
