@@ -6,8 +6,7 @@ WORKDIR /usr/app/front
 EXPOSE 3000
 COPY ./ ./
 
-RUN npm config rm proxy
-RUN npm config rm https-proxy
+RUN npm config set registry http://registry.npmjs.org/
 RUN npm install
 
 CMD ["node", "server.js"]
