@@ -2,7 +2,9 @@ FROM node:12.18.3
 
 RUN mkdir -p /proj/
 WORKDIR /proj/
-COPY ./ ./proj/
+COPY ./ /proj/
+
+RUN npm i
 
 EXPOSE 3000
 
