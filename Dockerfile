@@ -1,5 +1,8 @@
 FROM node:12.18.3
 
+RUN sudo apt update
+RUN sudo apt install npm
+
 RUN mkdir -p /proj/
 WORKDIR /proj/
 COPY . /proj/
