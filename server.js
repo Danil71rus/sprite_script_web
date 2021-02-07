@@ -6,7 +6,7 @@ const path = require('path');
 const config = require("./my.config");
 const util = require("./server/util");
 
-const hostname = "123";//config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
+const hostname = "localhost";//config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
 const port = config.serverFile.port;
 const dirProject = config.serverFile.dirProject;
 global.__basedir = __dirname;
