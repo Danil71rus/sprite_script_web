@@ -1,12 +1,13 @@
-//const ip = require("ip");
+const ip = require("ip");
 const cors = require("cors");
 const express = require("express");
 const history = require('connect-history-api-fallback');
 const path = require('path');
 const config = require("./my.config");
 const util = require("./server/util");
+const initRoutes = require("./server/routes");
 
-const hostname = "localhost";//config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
+const hostname = config.serverFile.host === "auto" ? ip.address() : config.serverFile.host;
 const port = config.serverFile.port;
 const dirProject = config.serverFile.dirProject;
 global.__basedir = __dirname;
@@ -19,16 +20,16 @@ util.createUploidDir();
 const corsOptions = {
     origin: `http://${hostname}:${config.client.port}`,
 };
-const initRoutes = require("./server/routes");
-initRoutes(app);
+console.log(`cors: ${corsOptions.origin}`);
 
 app.use(cors(corsOptions));
+initRoutes(app);
 app.use(express.urlencoded({ extended: true }));
 app.use(history());
 app.use(staticFileMiddleware);
 
-//app.listen(port, hostname, () => {
-app.listen(port, () => {
+app.listen(port, hostname, () => {
+// app.listen(port, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 

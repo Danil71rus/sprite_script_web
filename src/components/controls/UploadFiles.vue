@@ -145,10 +145,10 @@ export default class UploadFiles extends Vue {
 
      click() {
         if (this.$route.params.dir) {
+            this.isLoading = true
             const obg = {dirName: this.$route.params.dir}
             Vue.axios.get('/compress-file', {params: obg})
                 .then(res=>{
-                    this.isLoading = true
                     return this.delayPromis(5000, res);
                 })
                 .then((response) => {
